@@ -1,24 +1,14 @@
-package com.intreturn.noclastoday.lwjgl3;
+package com.intreturn.noclasstoday.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.intreturn.noclastoday.MyGdxGame;
+import com.intreturn.noclasstoday.MyGdxGame;
 
 public class Lwjgl3Launcher {
-    public static void main(String[] args) {
-        createApplication();
-    }
-
-    private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new MyGdxGame(), getDefaultConfiguration());
-    }
-
-    private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
-        Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("Red Square Demo");
-        configuration.useVsync(true);
-        configuration.setForegroundFPS(60);
-        configuration.setWindowedMode(800, 480);
-        return configuration;
+    public static void main(String[] arg) {
+        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+        config.setTitle("Chess Game");
+        config.setWindowedMode(800, 600);
+        new Lwjgl3Application(new MyGdxGame(), config);
     }
 }

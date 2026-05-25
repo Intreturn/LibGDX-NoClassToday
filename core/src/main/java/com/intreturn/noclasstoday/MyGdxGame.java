@@ -1,38 +1,71 @@
-package com.intreturn.noclastoday;
+package com.intreturn.noclasstoday;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MyGdxGame extends ApplicationAdapter {
-    private OrthographicCamera camera;
-    private ShapeRenderer shapeRenderer;
+    private SpriteBatch batch;
+    private ShapeRenderer shape;
+    private BitmapFont font;
+
+    private final int BOARD_SIZE = 8;
+    private final int TILE_SIZE = 80;
 
     @Override
     public void create() {
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
-        shapeRenderer = new ShapeRenderer();
+        batch = new SpriteBatch();
+        shape = new ShapeRenderer();
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
     }
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1);
 
-        camera.update();
-        shapeRenderer.setProjectionMatrix(camera.combined);
+        // 绘制棋盘
+        drawChessBoard();
+    }
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(1, 0, 0, 1);
-        shapeRenderer.rect(400 - 25, 240 - 25, 50, 50);
-        shapeRenderer.end();
+    private void drawChessBoard() {
+        int startX = (Gdx.graphics.getWidth() - BOARD_SIZE * TILE_SIZE) / 2;
+        int startY = (Gdx.graphics.getHeight() - BOARD_SIZE * TILE_SIZE) / 2;
+
+        shape.begin(ShapeRenderer.ShapeType.Filled);
+
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                boolean isLight = (row + col) % 2 == 0;
+                if (isLight) {
+                    shape.setColor(0.9f, 0.85f, 0.75f, 1);
+                } else {
+                    shape.setColor(0.35f, 0.25f, 0.15f, 1);
+                }
+
+                float x = startX + col * TILE_SIZE;
+                float y = startY + row * TILE_SIZE;
+                shape.rect(x, y, TILE_SIZE, TILE_SIZE);
+            }
+        }
+
+        shape.end();
+
+        // 绘制文字
+        batch.begin();
+        font.draw(batch, "国际象棋棋盘", 10, Gdx.graphics.getHeight() - 10);
+        batch.end();
     }
 
     @Override
     public void dispose() {
-        shapeRenderer.dispose();
+        batch.dispose();
+        shape.dispose();
+        font.dispose();
     }
 }

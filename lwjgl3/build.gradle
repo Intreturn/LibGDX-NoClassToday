@@ -3,7 +3,8 @@ plugins {
 }
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-application.mainClass = 'com.intreturn.noclastoday.lwjgl3.Lwjgl3Launcher'
+// 👇 这里修复了！少了一个 s → 加上了！
+application.mainClass = 'com.intreturn.noclasstoday.lwjgl3.Lwjgl3Launcher'
 application.applicationName = appName
 eclipse.project.name = appName + '-lwjgl3'
 
@@ -22,7 +23,7 @@ dependencies {
 def os = System.properties['os.name'].toLowerCase(Locale.ROOT)
 
 run {
-  workingDir = rootProject.file("assets")
+  workingDir = file("D:/LibGDX/projects/lwjgl3")
 }
 
 jar {
