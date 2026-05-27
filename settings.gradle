@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS) // 改这里！
   repositories {
     maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
     google()

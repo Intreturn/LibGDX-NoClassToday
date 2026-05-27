@@ -2,21 +2,23 @@ buildscript {
   repositories {
     mavenCentral()
     gradlePluginPortal()
-    mavenLocal()
-    google()
-    maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
-  }
-  dependencies {
-
-
+    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
   }
 }
 
 allprojects {
-  apply plugin: 'eclipse'
-  apply plugin: 'idea'
+  ext {
+    gdxVersion = '1.12.1'
+    projectVersion = '1.0'
+    appName = 'NoClassTodayGame'
+  }
 
-  // This allows you to "Build and run using IntelliJ IDEA", an option in IDEA's Settings.
+  repositories {
+    mavenCentral()
+    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+  }
+
+  apply plugin: 'idea'
   idea {
     module {
       outputDir = file('build/classes/java/main')
@@ -27,43 +29,26 @@ allprojects {
 
 configure(subprojects) {
   apply plugin: 'java-library'
-  java.sourceCompatibility = 11
+  java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+  }
 
-  // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/
-  // The article can be helpful when using assets.txt in your project.
   tasks.register('generateAssetList') {
     inputs.dir("${project.rootDir}/assets/")
-    // projectFolder/assets
-    File assetsFolder = new File("${project.rootDir}/assets/")
-    // projectFolder/assets/assets.txt
-    File assetsFile = new File(assetsFolder, "assets.txt")
-    // delete that file in case we've already created it
-    assetsFile.delete()
-
-    // iterate through all files inside that folder
-    // convert it to a relative path
-    // and append it to the file assets.txt
-    fileTree(assetsFolder).collect { assetsFolder.relativePath(it) }.sort().each {
-      assetsFile.append(it + "\n")
+    doLast {
+      File assetsFolder = new File("${project.rootDir}/assets/")
+      File assetsFile = new File(assetsFolder, "assets.txt")
+      assetsFile.delete()
+      fileTree(assetsFolder).collect { assetsFolder.relativePath(it) }.sort().each {
+        assetsFile.append(it + "\n")
+      }
     }
   }
   processResources.dependsOn 'generateAssetList'
 
-  compileJava {
-    options.incremental = true
-  }
+  compileJava.options.incremental = true
 }
 
-subprojects {
-  version = "$projectVersion"
-  ext.appName = 'NoClassTodayGame'
-  repositories {
-    mavenCentral()
-    // You may want to remove the following line if you have errors downloading dependencies.
-    mavenLocal()
-    maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
-    maven { url = 'https://jitpack.io' }
-  }
-}
-
-eclipse.project.name = 'NoClassTodayGame' + '-parent'
+// 👇 关键：下面这行必须删掉，你现在报错就是因为它
+// eclipse.project.name = appName + '-parent'

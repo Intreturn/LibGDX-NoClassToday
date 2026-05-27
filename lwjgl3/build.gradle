@@ -3,24 +3,21 @@ plugins {
 }
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-// 👇 这里修复了！少了一个 s → 加上了！
-application.mainClass = 'com.intreturn.noclasstoday.lwjgl3.Lwjgl3Launcher'
-application.applicationName = appName
-eclipse.project.name = appName + '-lwjgl3'
 
-java.sourceCompatibility = 11
-java.targetCompatibility = 11
-if (JavaVersion.current().isJava9Compatible()) {
-  compileJava.options.release.set(11)
+application {
+  mainClass.set('com.intreturn.noclasstoday.lwjgl3.Lwjgl3Launcher')
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
 
 dependencies {
+  implementation project(':core')
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-  implementation project(':core')
 }
-
-def os = System.properties['os.name'].toLowerCase(Locale.ROOT)
 
 run {
   workingDir = file("D:/LibGDX/projects/lwjgl3")
@@ -29,12 +26,16 @@ run {
 jar {
   archiveFileName.set("${appName}-${projectVersion}.jar")
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-  dependsOn configurations.runtimeClasspath
   from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
-  dependencies { exclude('META-INF/INDEX.LIST', 'META-INF/maven/**') }
-  manifest { attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED', 'Multi-Release': 'true' }
-  doLast { file(archiveFile).setExecutable(true, false) }
+  exclude 'META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+
+  manifest {
+    attributes(
+      'Main-Class': application.mainClass.get(),
+      'Enable-Native-Access': 'ALL-UNNAMED',
+      'Multi-Release': 'true'
+    )
+  }
 }
 
 tasks.register('dist') { dependsOn 'jar' }

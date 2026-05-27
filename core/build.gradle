@@ -7,9 +7,6 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
 }
 
-sourceSets.main.resources.srcDirs += ["../assets"]
-
 dependencies {
-  api "com.badlogicgames.gdx:gdx:1.14.1"
-  api "com.badlogicgames.gdx:gdx-platform:1.14.1:natives-desktop"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
 }
