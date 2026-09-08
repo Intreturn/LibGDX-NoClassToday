@@ -21,9 +21,14 @@ dependencies {
 
 run {
   workingDir = file("D:/LibGDX/projects/lwjgl3")
+  // 确保先构建 :core 等依赖项目,避免使用陈旧的 core.jar
+  dependsOn configurations.runtimeClasspath
 }
 
 jar {
+  // 关键:让打包前先重建依赖项目(如 :core 的 jar),
+  // 否则 from 闭包会解包陈旧的 core.jar,新代码进不了最终 jar
+  dependsOn configurations.runtimeClasspath
   archiveFileName.set("${appName}-${projectVersion}.jar")
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }

@@ -1,32 +1,29 @@
 package com.intreturn.noclasstoday;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Gdx;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+    private ChessScreen chessScreen;
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+        chessScreen = new ChessScreen();
     }
 
     @Override
     public void render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+        chessScreen.render(Gdx.graphics.getDeltaTime());
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        chessScreen.resize(width, height);
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+        chessScreen.dispose();
     }
 }
