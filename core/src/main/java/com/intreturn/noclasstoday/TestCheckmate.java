@@ -32,6 +32,8 @@ public class TestCheckmate {
         testScholarsMate();
         testAnastasiasMate();
         testPromotionMate();
+        testBlackMatesWhite();
+        testKingTrappedButDefendable();
         testRandomPlay();
         System.out.println("===== passed=" + passed + " failed=" + failed + " =====");
         if (failed > 0) System.exit(1);
@@ -156,6 +158,60 @@ public class TestCheckmate {
         g.makeMove(6, 2, 7, 2, 'q');      // c8=Q#
         check("升变将死: 白方胜", "1-0".equals(g.getResult()));
         check("原因=将死", "将死".equals(g.getResultReason()));
+    }
+
+    /** 黑方将死白方: 白王h1被兵g2/车g1困住, 黑马g4->f2# + 黑后h4控制h2 */
+    static void testBlackMatesWhite() {
+        ChessGame g = new ChessGame();
+        String[][] b = empty();
+        b[0][7] = "k";           // 白王 h1
+        b[1][6] = "p";           // 白兵 g2
+        b[0][6] = "r";           // 白车 g1
+        b[3][6] = "N";           // 黑马 g4
+        b[3][7] = "Q";           // 黑后 h4
+        b[7][0] = "K";           // 黑王 a8
+        g.loadPosition(b, true, false, false, false, false, -1, -1, 0);
+        check("黑马g4->f2合法", hasMove(g.getLegalMoves(3, 6), 1, 5));
+        g.makeMove(3, 6, 1, 5, (char) 0); // Nf2#
+        check("黑方将死白方: 黑方胜", "0-1".equals(g.getResult()));
+        check("原因=将死", "将死".equals(g.getResultReason()));
+    }
+
+    /**
+     * 关键场景(用户报告的bug): 白王h1被马f2将军且王无路可走,
+     * 但白象c5可以吃f2马解将 -> 标准规则游戏继续, 用户规则应判负.
+     */
+    static void testKingTrappedButDefendable() {
+        ChessGame g = new ChessGame();
+        String[][] b = empty();
+        b[0][7] = "k";           // 白王 h1
+        b[1][6] = "p";           // 白兵 g2
+        b[0][6] = "r";           // 白车 g1
+        b[4][2] = "b";           // 白象 c5 (可斜吃f2解将)
+        b[3][6] = "N";           // 黑马 g4
+        b[6][2] = "B";           // 黑象 c7 (控制h2使王无路, 但不将军h1)
+        b[7][0] = "K";           // 黑王 a8
+        g.loadPosition(b, true, false, false, false, false, -1, -1, 0);
+        check("黑马g4->f2合法", hasMove(g.getLegalMoves(3, 6), 1, 5));
+        g.makeMove(3, 6, 1, 5, (char) 0); // Nf2+ 将军
+        check("白王被将军", g.isInCheck(false));
+        check("白王h1自身无合法走法", g.getLegalMoves(0, 7).isEmpty());
+        check("用户规则: 王无路可走立即判负", "0-1".equals(g.getResult()));
+        check("原因=将死", "将死".equals(g.getResultReason()));
+
+        // 独立实例: 验证标准规则下白象确实可吃f2马解将 (证明此局面并非标准将死)
+        ChessGame g2 = new ChessGame();
+        String[][] b2 = empty();
+        b2[0][7] = "k";
+        b2[1][6] = "p";
+        b2[0][6] = "r";
+        b2[4][2] = "b";
+        b2[1][5] = "N";           // 黑马已在f2 (将军)
+        b2[6][2] = "B";
+        b2[7][0] = "K";
+        g2.loadPosition(b2, false, false, false, false, false, -1, -1, 0);
+        check("标准规则: 白象c5可吃f2马解将", hasMove(g2.getLegalMoves(4, 2), 1, 5));
+        check("标准规则: 白方仍有解将走法(非将死)", g2.hasAnyLegalMove(false));
     }
 
     /** 随机自弈压力测试: 每步走法合法, 王永不被吃, 将军时所有走法都解除将军 */
